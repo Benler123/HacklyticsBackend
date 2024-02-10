@@ -12,3 +12,12 @@ def get_all_tickers():
     us_exchanges = ["XNAS"]
     tickers = [symbol['symbol'] for symbol in all_ref_data if symbol['type'] == 'cs' and symbol['exchange'] in us_exchanges]
     return tickers
+
+def fetch_headlines(ticker): 
+    url = f"https://api.iex.cloud/v1/data/core/news/{ticker}?last=10&token={api_token}"
+    data = requests.get(url).json()
+    headlines = [single_data['headline'] for single_data in data]
+    print(headlines)
+    return headlines
+
+fetch_headlines("AMZN")
