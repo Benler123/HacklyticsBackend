@@ -1,14 +1,6 @@
 import pymongo
 from pymongo import MongoClient
-
-
-# # MongoDB 
-# username = "tinderforstocks"
-# password = "9w0rICnGSUESKqeM"
-
-# uri = f"mongodb+srv://{username}:{password}@hacklytics.pz7w1jr.mongodb.net/?retryWrites=true&w=majority"
-# client = MongoClient(uri, server_api=ServerApi('1'))
-# database = client.tinder_for_stocks
+import pandas as pd
 
 password = "Boris123"
 
@@ -21,9 +13,20 @@ db = cluster["StockData"]
 tickers_collections = db["Tickers"]
 swipes_collection = db["Swipes"]
 
-def add_ticker_info(): 
-    tickers_collections.insert_one({"_id":0, "user_name":"Soumi"})
-    tickers_collections.insert_one({"_id":100, "user_name":"Ravi"})
+def clear_tickers():
+    tickers_collections.delete_many({})
+
+def add_ticker_info(ticker, pe, marketCap, forwardPE, beta, sector, headlines): 
+    tickers_collections.insert_one({"ticker": ticker, "pe": pe, "forwardPE":forwardPE, "marketCap":marketCap, "beta": beta, "sector": sector, "headlines": headlines})
+
 
 def add_swipe(ticker, swiped):
     swipes_collection.insert_one({"ticker": ticker, "swiped":swiped})
+
+def return_ticker_df():
+    tickers_collections.find({})
+    df = pd.DataFrame(list(tickers_collections.find({})))
+    return df
+
+print(return_ticker_df().head())
+                             
