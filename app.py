@@ -53,7 +53,12 @@ def get_intraday(ticker):
         else:
             last_val = intraday_dict[key]
     return intraday_dict
-        
+    
+@app.get('/PE/{ticker}')
+def get_PE(ticker):
+    PE = requests.get(url + f"/PE_RATIO/{ticker}?token={token}").json()
+    
+    return PE
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8001, debug=True)
