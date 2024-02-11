@@ -124,7 +124,7 @@ def get_marketcap(ticker):
 
 @app.get('/DividentYield/{ticker}')
 def get_dividentyield(ticker):
-    dy = (requests.get(url + f"/fundamental_valuations/{ticker}?token={token}").json())[0]["dividentYield"]
+    dy = (requests.get(url + f"/fundamental_valuations/{ticker}?token={token}").json())[0]["dividendYield"]
     return dy #returns integer
 
 @app.get('/AnnualReturn/{ticker}')
