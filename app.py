@@ -120,21 +120,6 @@ def get_marketcap(ticker):
     return mc
 
 
-
-
-
-def predict_sentiment(): 
-    # for ticker in SP_tickers: 
-        # fetch all articles headline for that ticker
-        # headlines = fetch_headlines(ticker)
-    headlines = []
-    for headline in headlines: 
-        payload = { "inputs": headline }
-        response = requests.post(API_URL, headers=headers, json=headline)
-        response = response.json()
-        
-        return response.json()
-
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8001)
 
