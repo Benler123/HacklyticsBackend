@@ -55,7 +55,7 @@ def cold_start(df, risk_levels, sectors):
     differences = (df['PE'] - df['forwardPE']).tolist()
     mask = differences != 0
     sorted_indices = np.argsort(differences)[mask][::-1]  
-    return df.iloc[sorted_indices[int(risk_levels / 10.01 * len(df))]]['ticker'] 
+    return df.iloc[sorted_indices[int(risk_levels / 10.01 * len(sorted_indices))]]['ticker'] 
 
 import json
 def load_sentiments(): 
