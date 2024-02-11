@@ -176,13 +176,13 @@ def get_first_ticker():
 
 @app.get('/get_next_ticker/{this_ticker}/{swiped}')
 def get_next_ticker(this_ticker, swiped):
+    add_swipe(this_ticker, swiped)
     sectors = account_df['sectors'].tolist()[0]
     risk_level = account_df['risk_level'].tolist()[0] 
     seen = set(mongo_connector.get_seen())
     if(not seen):
-        return mongo_connector.cold_start(ticker_df, risk_level, sectors)
+        return iex_connector.cold_start(ticker_df, risk_level, sectors)
     stock = iex_connector.recommend_stocks(this_ticker, ticker_df, sectors, seen)
-    add_swipe(this_ticker, swiped)
     return compile_data(stock)
 
 @app.get('/gpt_chat/{ticker}/{prompt}')
