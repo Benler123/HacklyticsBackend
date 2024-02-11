@@ -2,16 +2,40 @@ import requests
 import os
 
 
-os.environ["OPENAI_API_KEY"] = "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"
-
-
-
-prompt = "The following question is from a beginning investor looking to learn more about stocks. Please answer in one paragraph in a way that is easily understandable."
-
-
-
-def answer_question(ticker, question, news, beta, pe, sector, sectorPE, api_key=os.environ.get("OPENAI_API_KEY")):
+def answer_question(question, api_key=os.environ.get("OPENAI_API_KEY")):
     # print(api_key)
+    prompt = "The following question is from a beginning investor looking to learn more about stocks. Please answer in one paragraph in a way that is easily understandable."
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+
+    payload = {
+            "model": "gpt-3.5-turbo-0125",
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": prompt + "\n" + question
+                        }
+                    ]
+                }
+            ],
+            "max_tokens": 512
+        }
+
+    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload).json()
+    return response["choices"][0]["message"]["content"]
+
+
+
+def answer_question_ticker(ticker, question, news, beta, pe, sector, sectorPE, api_key=os.environ.get("OPENAI_API_KEY")):
+    # print(api_key)
+    prompt = "The following question is from a beginning investor looking to learn more about stocks. Please answer in one paragraph in a way that is easily understandable."
+
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {api_key}"
@@ -52,8 +76,4 @@ def answer_question(ticker, question, news, beta, pe, sector, sectorPE, api_key=
 
     response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload).json()
     return response["choices"][0]["message"]["content"]
-
-print("hello")
-
-print(answer_question("AAPL", "How do I know if I should invest in this stock or not?", {}, 1.5, 27, "Technology", 40))
 
