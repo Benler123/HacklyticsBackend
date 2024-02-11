@@ -25,3 +25,5 @@ def get_portfolio():
                 "Annual Return": annual_return
             }
     return portfolio
+
+print(get_portfolio())

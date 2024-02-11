@@ -288,5 +288,4 @@ def get_gpt_chat(ticker, prompt):
     return gpt_chatbot.answer_question_ticker(ticker, prompt, news, beta, pe, sector, sectorPE)
 
 if __name__ == "__main__":
-    #uvicorn.run(app, host="127.0.0.1", port=8001)
-    get_allocation("low")
+    uvicorn.run(app, host="127.0.0.1", port=8001)
