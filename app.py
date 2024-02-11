@@ -219,12 +219,15 @@ def get_allocation(RiskProfile):
         actualReturn += allocDict[ticker] * returnVector[i]
         i += 1
         j = 0
-
-    while ((abs(desiredRisk - actualRisk) > 0.1) or ((desiredReturn - actualReturn > 0.02))):
+    iters = 0
+    while ((abs(desiredRisk - actualRisk) > 0.2) or ((desiredReturn - actualReturn > 0.02))):
+           iters += 1
            j += 1
            index1 = random.randrange(len(allocDict))
            index2 = random.randrange(len(allocDict))
            allocChange = random.uniform(0, 0.05)
+           if (iters == 20):
+               break
            if (allocDict[tickerVector[index2]] - allocChange > 0):
                 allocDict[tickerVector[index1]] += allocChange
                 allocDict[tickerVector[index2]] -= allocChange

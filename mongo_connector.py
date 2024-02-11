@@ -71,3 +71,4 @@ def get_sector_mdb(ticker):
     ticker_data = tickers_collections.find_one({"ticker": ticker})
     sector = ticker_data.get("Sector")
     return sector
+
