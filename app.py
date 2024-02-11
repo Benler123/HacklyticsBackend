@@ -143,6 +143,7 @@ def compile_data(ticker):
     description_data = ticker_df[ticker_df['ticker'] == ticker]['Description'].tolist()[0]
     dividend_data = ticker_df[ticker_df['ticker'] == ticker]['DividentYield'].tolist()[0]
     annualReturn_data = ticker_df[ticker_df['ticker'] == ticker]['AnnualReturn'].tolist()[0]
+    sentiment_data = ticker_df[ticker_df['ticker'] == ticker]['Sentiment'].tolist()[0]
     data = {
         'ticker': ticker,
         'graph_data': graph_data,
@@ -157,7 +158,8 @@ def compile_data(ticker):
         'sector_data': sector_data,
         'description_data': description_data,
         'annualReturn_data': annualReturn_data,
-        'dividend_data': dividend_data
+        'dividend_data': dividend_data,
+        'sentiment': sentiment_data
     }
     return data
 
