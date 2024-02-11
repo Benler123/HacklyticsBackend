@@ -54,7 +54,8 @@ def cold_start(df, risk_levels, sectors):
     sector_df = df[df['Sector'].isin(sectors)]
     differences = (df['PE'] - df['forwardPE']).tolist()
     mask = differences != 0
-    sorted_indices = np.argsort(differences)[mask][::-1]  
+    filtered_differences = differences[mask]
+    sorted_indices = np.argsort(filtered_differences)[::-1]
     return df.iloc[sorted_indices[int(risk_levels / 10.01 * len(sorted_indices))]]['ticker'] 
 
 import json
