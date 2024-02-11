@@ -136,10 +136,6 @@ def get_annualreturn(ticker):
 def add_swipe(ticker, swiped):
     mongo_connector.add_swipe(ticker, swiped)
 
-def get_sentiment(ticker): 
-
-
-
 
 
 def compile_data(ticker):

@@ -2,8 +2,6 @@ import pymongo
 import json
 from pymongo import MongoClient
 import pandas as pd
-from iex_connector import get_advanced_stats
-from app.py import get_annualreturn, get_sector
 
 password = "Boris123"
 
@@ -40,25 +38,6 @@ def add_all_sentiments():
             print(sentiment)
             add_sentiment(sentiment)
     
-def get_portfolio():
-    portfolio = []
-    swipes = swipes_collection.find()
-    for swipe in swipes: 
-        print(swipe)
-        ticker = swipe['ticker']
-        pe, beta, forwardPE, marketCap = get_advanced_stats(ticker)
-        annual_return = get_annualreturn(ticker)
-        sector = get_sector(ticker)
-        print(sector, beta, annual_return)
-        portfolio.append({
-            ticker: {
-                "sector": sector, 
-                "beta": beta, 
-                "annual_return": annual_return
-            }
-        })
-    return portfolio
-get_portfolio()
 
 
 def return_ticker_df():
@@ -82,5 +61,4 @@ def get_chosen():
     df = pd.DataFrame(list(swipes_collection.find({})))
     tickers = df.loc[df["swiped"] == "right", "ticker"].tolist()
     return tickers
-
 
