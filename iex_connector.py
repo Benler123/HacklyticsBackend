@@ -179,8 +179,14 @@ def recommend_stocks(stock_id, stocks_df, sectors, seen, top_n=1, sector_penalty
 
     # Calculate the distance between the chosen stock and all others, including sector penalty
     def adjusted_distance(row):
+        if(np.isnan(row['PE'])):
+            row['PE'] = 1
         if(np.isnan(row['forwardPE'])):
             row['forwardPE'] = row['PE']
+        if(np.isnan(row['Beta'])):
+            row['Beta'] = 1
+        if(np.isnan(row['MarketCap'])):
+            row['MarketCap'] = 1000000000
         # Basic Euclidean distance for Beta and PE
         distance = euclidean(chosen_stock_features, [row['Beta'], row['PE'], row['forwardPE'], row['MarketCap']])
         # Apply penalty if sectors match
