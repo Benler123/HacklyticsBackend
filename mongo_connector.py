@@ -1,15 +1,9 @@
 import pymongo
 import json
 from pymongo import MongoClient
-
-
-# # MongoDB 
-# username = "tinderforstocks"
-# password = "9w0rICnGSUESKqeM"
-
-# uri = f"mongodb+srv://{username}:{password}@hacklytics.pz7w1jr.mongodb.net/?retryWrites=true&w=majority"
-# client = MongoClient(uri, server_api=ServerApi('1'))
-# database = client.tinder_for_stocks
+import pandas as pd
+from iex_connector import get_advanced_stats
+from app.py import get_annualreturn, get_sector
 
 password = "Boris123"
 
@@ -22,10 +16,16 @@ db = cluster["StockData"]
 tickers_collections = db["Tickers"]
 swipes_collection = db["Swipes"]
 sentiment_collections = db["Sentiments"]
+accounts_collection = db["Account"]
 
-def add_ticker_info(): 
-    tickers_collections.insert_one({"_id":0, "user_name":"Soumi"})
-    tickers_collections.insert_one({"_id":100, "user_name":"Ravi"})
+def clear_tickers():
+    tickers_collections.delete_many({})
+
+def clear_swipes():
+    swipes_collection.delete_many({})
+
+def add_ticker_info(ticker, pe, marketCap, forwardPE, beta, sector, headlines): 
+    tickers_collections.insert_one({"ticker": ticker, "PE": pe, "forwardPE":forwardPE, "MarketCap":marketCap, "Beta": beta, "Sector": sector, "headlines": headlines})
 
 def add_swipe(ticker, swiped):
     swipes_collection.insert_one({"ticker": ticker, "swiped":swiped})
@@ -38,24 +38,49 @@ def add_all_sentiments():
         loaded_sentiments = json.load(file_object)
         for sentiment in loaded_sentiments: 
             print(sentiment)
-            #add_sentiment()
+            add_sentiment(sentiment)
     
+def get_portfolio():
+    portfolio = []
+    swipes = swipes_collection.find()
+    for swipe in swipes: 
+        print(swipe)
+        ticker = swipe['ticker']
+        pe, beta, forwardPE, marketCap = get_advanced_stats(ticker)
+        annual_return = get_annualreturn(ticker)
+        sector = get_sector(ticker)
+        print(sector, beta, annual_return)
+        portfolio.append({
+            ticker: {
+                "sector": sector, 
+                "beta": beta, 
+                "annual_return": annual_return
+            }
+        })
+    return portfolio
+get_portfolio()
 
 
-portfolio = []
-swipes = swipes_collection.find()
-for swipe in swipes: 
-    ticker = swipe['ticker']
-    ticker_info = tickers_collections.find({"ticker": ticker})
-    beta = ticker_info['beta']
-    sector = ticker_info['sector']
-    get_annual
-    portfolio.append({
-        ticker: {
-            "beta": beta, 
-            "sector": sector, 
-            "annual_return": annual_return
-        }
-    })
+def return_ticker_df():
+    tickers_collections.find({})
+    df = pd.DataFrame(list(tickers_collections.find({})))
+    return df
+
+def add_account(risk_level, sectors, companyAge, companySize):
+    accounts_collection.delete_many({})
+    clear_swipes()
+    accounts_collection.insert_one({"risk_level": risk_level, "sectors":sectors, "companyAge":companyAge, "companySize":companySize})
+
+def return_account_df():
+    df = pd.DataFrame(list(accounts_collection.find({})))
+    return df
+
+def get_seen():
+    return pd.DataFrame(list(swipes_collection.find({})))["ticker"].tolist()
+
+def get_chosen():
+    df = pd.DataFrame(list(swipes_collection.find({})))
+    tickers = df.loc[df["swiped"] == "right", "ticker"].tolist()
+    return tickers
 
 
