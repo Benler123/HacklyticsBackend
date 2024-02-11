@@ -39,7 +39,11 @@ def return_account_df():
     return df
 
 def get_seen():
-    return pd.DataFrame(list(swipes_collection.find({})))["ticker"].tolist()
+    swipes =  pd.DataFrame(list(swipes_collection.find({})))
+    if(swipes.empty):
+        return []
+    else:
+        return swipes["ticker"].tolist()
 
 def get_chosen():
     df = pd.DataFrame(list(swipes_collection.find({})))
