@@ -6,8 +6,11 @@ from datetime import datetime
 import mongo_connector
 import iex_connector
 import json
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 app = FastAPI()
+app.add_middleware(HTTPSRedirectMiddleware)
+
 origins = ["*"]
 
 app.add_middleware(
