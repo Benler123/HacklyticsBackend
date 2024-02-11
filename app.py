@@ -258,13 +258,13 @@ def get_allocation(RiskProfile):
 #Only need these three endpoints
 @app.get('/create_account/{risk_level}/{sectors}/{companyAge}/{companySize}') 
 def add_account(risk_level, sectors, companyAge, companySize):
-    sector_list = sectors.split(",")
+    sector_list = sectors.replace('"', '').replace(' ', '').split(",")
     mongo_connector.add_account(risk_level, sector_list, companyAge, companySize)
 
 
 @app.get('/get_next_ticker')
 def get_first_ticker():
-    ticker = iex_connector.cold_start(ticker_df, account_df['risk_level'].tolist()[0], account_df['sectors'].tolist()[0])
+    ticker = iex_connector.cold_start(ticker_df, account_df['risk_level'].tolist()[0], account_df['sectors'].tolist())
     return compile_data(ticker)
 
 @app.get('/get_next_ticker/{this_ticker}/{swiped}')
