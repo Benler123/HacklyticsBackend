@@ -38,7 +38,7 @@ def index():
 
 @app.get('/CompanyName/{ticker}')
 def get_companyname(ticker):
-    return iex_connector.get_company_name(ticker)
+    return iex_connector.get_companyname(ticker)
 
 @app.get('/CompanySize/{ticker}')
 def get_companysize(ticker):
