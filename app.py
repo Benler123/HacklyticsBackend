@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import mongo_connector
 import iex_connector
+import json
 
 app = FastAPI()
 origins = ["*"]
@@ -64,9 +65,8 @@ def get_graph(ticker):
 
 @app.get('/intraday/{ticker}')
 def get_intraday(ticker):
-    print("HIII\n\n\n\n\n")
     print(url + f"/intraday_prices/{ticker}?token={token}")
-
+    print("TICKER " + ticker)
     intraday_json = requests.get(url + f"/intraday_prices/{ticker}?token={token}").json()
     intraday_dict = {day["minute"]: day["average"] for day in intraday_json}
     i = 0
@@ -122,24 +122,75 @@ def get_marketcap(ticker):
     mc = (requests.get(url + f"/quote/{ticker}?token={token}").json())[0]["marketCap"]
     return mc
 
+@app.get('/DividentYield/{ticker}')
+def get_dividentyield(ticker):
+    dy = (requests.get(url + f"/fundamental_valuations/{ticker}?token={token}").json())[0]["dividentYield"]
+    return dy #returns integer
 
+@app.get('/AnnualReturn/{ticker}')
+def get_annualreturn(ticker):
+    dy = (requests.get(url + f"/advanced_stats/{ticker}?token={token}").json())[0]["year1ChangePercent"]
+    return dy #returns integer
 
 @app.put('/add_swipe/{swiped}')
 def add_swipe(ticker, swiped):
     mongo_connector.add_swipe(ticker, swiped)
 
+def compile_data(ticker):
+    graph_data = get_graph(ticker)
+    intraday_data = get_intraday(ticker)
+    marketcap_data = get_marketcap(ticker)
+    pe_data = get_PE(ticker)
+    consolidatedvolume_data = get_consolidatedvolume(ticker)
+    marketOpen_data = get_marketopen(ticker)
+    previousClose_data = get_previousClose(ticker)
+    name_data = get_companyname(ticker)
+    size_data = get_companysize(ticker)
+    sector_data = get_sector(ticker)
+    description_data = get_description(ticker)
+    dividend_data = get_dividentyield(ticker)
+    annualReturn_data = get_annualreturn(ticker)
+    data = {
+        'ticker': ticker,
+        'graph_data': graph_data,
+        'intraday_data': intraday_data,
+        'marketcap_data': marketcap_data,
+        'pe_data': pe_data,
+        'consolidatedvolume_data': consolidatedvolume_data,
+        'marketOpen_data': marketOpen_data,
+        'previousClose_data': previousClose_data,
+        'name_data': name_data,
+        'size_data': size_data,
+        'sector_data': sector_data,
+        'description_data': description_data,
+        'annualReturn_data': annualReturn_data,
+        'dividend_data': dividend_data
+    }
+    return data
+
+#Only need these three endpoints
 @app.get('/create_account/{risk_level}/{sectors}/{companyAge}/{companySize}') 
 def add_account(risk_level, sectors, companyAge, companySize):
     mongo_connector.add_account(risk_level, sectors, companyAge, companySize)
+
+
+@app.get('/get_next_ticker')
+def get_first_ticker():
+    ticker = iex_connector.cold_start(ticker_df, account_df['risk_level'].tolist()[0], account_df['sectors'].tolist()[0])
+    json_data = json.dumps(compile_data(ticker))
+    return json_data
 
 @app.get('/get_next_ticker/{this_ticker}/{swiped}')
 def get_next_ticker(this_ticker, swiped):
     sectors = account_df['sectors'].tolist()[0]
     risk_level = account_df['risk_level'].tolist()[0] 
     seen = set(mongo_connector.get_seen())
+    if(not seen):
+        return mongo_connector.cold_start(ticker_df, risk_level, sectors)
     stock = iex_connector.recommend_stocks(this_ticker, ticker_df, sectors, seen)
     add_swipe(this_ticker, swiped)
-    return stock
+    return compile_data(stock)
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8001)
