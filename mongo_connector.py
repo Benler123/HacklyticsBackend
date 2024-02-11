@@ -15,9 +15,6 @@ tickers_collections = db["Tickers"]
 swipes_collection = db["Swipes"]
 accounts_collection = db["Account"]
 
-def clear_tickers():
-    tickers_collections.delete_many({})
-
 def clear_swipes():
     swipes_collection.delete_many({})
 

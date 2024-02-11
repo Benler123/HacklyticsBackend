@@ -5,9 +5,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
 import mongo_connector
 import iex_connector
+import portfolio
 import json
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 import gpt_chatbot
+import random
 
 
 sector_averages = {'Manufacturing': 27.128207770965183, 'Information': 102.45399150817262, 'Utilities': 18.260429501527625, 'Finance and Insurance': 23.883056669680943, 'Administrative and Support and Waste Management and Remediation Services': 12.773875751491111, 'Retail Trade': 26.22744648757113, '': 40.36302307724007, 'Transportation and Warehousing': 23.774693737012072, 'Mining, Quarrying, and Oil and Gas Extraction': 10.798852278405514, 'Professional, Scientific, and Technical Services': 33.64500411865372, 'Accommodation and Food Services': 58.81457808263933, 'Real Estate and Rental and Leasing': 301.6988717606318, 'Wholesale Trade': 22.95699642519311, 'Public Administration': 43.94384020145358, 'Health Care and Social Assistance': 21.418444120490307, 'Construction': 17.58605288694844, 'Other Services (except Public Administration)': 17.21779153778833}
@@ -129,8 +131,6 @@ def get_annualreturn(ticker):
 def add_swipe(ticker, swiped):
     mongo_connector.add_swipe(ticker, swiped)
 
-
-
 def compile_data(ticker):
     graph_data = get_graph(ticker)
     intraday_data = get_intraday(ticker)
@@ -162,6 +162,98 @@ def compile_data(ticker):
         'dividend_data': dividend_data
     }
     return data
+
+@app.get('/RecommendedPortfolio/{RiskProfile}/')
+def get_allocation(RiskProfile):
+    if RiskProfile == "low":
+        desiredRisk = 0.8
+        desiredReturn = 0.07
+    elif RiskProfile == "medium":
+        desiredRisk = 1
+        desiredReturn = 0.11
+    elif RiskProfile == "high":
+        desiredRisk = 1.2
+        desiredReturn = 0.14
+    
+    stockDict = portfolio.get_portfolio()
+    #print(stockDict)
+    #print("\n\n\n")
+    sectorDict = {}
+    allocDict = {}
+    riskVector = []
+    returnVector = []
+    tickerVector = []
+    A = []
+    B = []
+    numStocks = len(stockDict)
+    for ticker, stockData in stockDict.items():
+        allocDict[ticker] = 0
+        tickerVector.append(ticker)
+        sector = stockData["Sector"] # dictionary returning sector of stock
+        if (sector in sectorDict):
+            sectorDict[sector].append(ticker)
+        else:
+            sectorDict[sector] = [ticker, ]
+        riskVector.append(stockData["Beta"])
+        returnVector.append(stockData["Annual Return"])
+    
+    #print(sectorDict)
+    #print(tickerVector)
+    numSectors = len(sectorDict)
+    sectorWeight = 1 / numSectors
+    for sector in sectorDict:
+        #print("\n\n")
+        #print(sector)
+        sectorVector = [0] * numStocks
+        B.append(sectorWeight)
+        weight = round((1 / (numSectors * len(sectorDict[sector]))), 5)
+        #print(weight)
+        for j in sectorDict[sector]:
+            allocDict[j] = weight
+    
+    actualRisk = 0
+    actualReturn = 0
+    i = 0
+    for ticker in tickerVector:
+        actualRisk += allocDict[ticker] * riskVector[i]
+        actualReturn += allocDict[ticker] * returnVector[i]
+        i += 1
+        j = 0
+
+    while ((abs(desiredRisk - actualRisk) > 0.1) or ((desiredReturn - actualReturn > 0.02))):
+           j += 1
+           index1 = random.randrange(len(allocDict))
+           index2 = random.randrange(len(allocDict))
+           allocChange = random.uniform(0, 0.05)
+           if (allocDict[tickerVector[index2]] - allocChange > 0):
+                allocDict[tickerVector[index1]] += allocChange
+                allocDict[tickerVector[index2]] -= allocChange
+                actualRisk = 0
+                actualReturn = 0
+                i = 0
+                for ticker in tickerVector:
+                        actualRisk += allocDict[ticker] * riskVector[i]
+                        actualReturn += allocDict[ticker] * returnVector[i]
+                        i += 1
+
+    #print(allocDict)
+    actualAlloc = {}
+    totalFundsInvested = 0
+    '''for tick in allocDict:
+        amtInStock = round(allocDict[tick] * funds, 2)
+        totalFundsInvested += amtInStock
+        actualAlloc[tick] = amtInStock
+        '''
+       
+    rd = {}
+    rd["Allocation"] = allocDict
+    rd["Desired risk"] = desiredRisk
+    rd["Actual risk"] =  round(actualRisk, 5)
+    rd["Desired return"] = desiredReturn
+    rd["Actual return"] = round(actualReturn, 5)
+
+    return(rd)
+
 
 #Only need these three endpoints
 @app.get('/create_account/{risk_level}/{co}/{companyAge}/{companySize}') 
@@ -195,5 +287,5 @@ def get_gpt_chat(ticker, prompt):
     return gpt_chatbot.answer_question_ticker(ticker, prompt, news, beta, pe, sector, sectorPE)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8001)
-
+    #uvicorn.run(app, host="127.0.0.1", port=8001)
+    get_allocation("low")
