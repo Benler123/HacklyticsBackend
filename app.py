@@ -107,27 +107,23 @@ def get_news(ticker):
 
 @app.get('/PreviousClose/{ticker}')
 def get_previousClose(ticker):
-    return iex_connector.get_previous_close(ticker)
+    return iex_connector.get_previousClose(ticker)
 
 @app.get('/MarketOpen/{ticker}')
 def get_marketopen(ticker):
-    return iex_connector.get_market_open(ticker)
+    return iex_connector.get_marketopen(ticker)
 
 @app.get('/RealTimeConsolidatedVolume/{ticker}')
 def get_consolidatedvolume(ticker):
     return iex_connector.get_consolidatedvolume(ticker)
 
-@app.get('/MarketCap/{ticker}')
-def get_marketcap(ticker):
-    return iex_connector.get_market_cap(ticker)
-
 @app.get('/DividentYield/{ticker}')
 def get_dividentyield(ticker):
-    return iex_connector.get_dividend_yield(ticker)
+    return iex_connector.get_dividentyield(ticker)
 
 @app.get('/AnnualReturn/{ticker}')
 def get_annualreturn(ticker):
-    return iex_connector.get_annual_return(ticker)
+    return iex_connector.get_annualreturn(ticker)
 
 @app.put('/add_swipe/{swiped}')
 def add_swipe(ticker, swiped):
@@ -140,15 +136,15 @@ def compile_data(ticker):
     intraday_data = get_intraday(ticker)
     marketcap_data = ticker_df[ticker_df['ticker'] == ticker]['MarketCap'].tolist()[0]
     pe_data = ticker_df[ticker_df['ticker'] == ticker]['PE'].tolist()[0]
-    consolidatedvolume_data = get_consolidatedvolume(ticker)
-    marketOpen_data = get_marketopen(ticker)
-    previousClose_data = get_previousClose(ticker)
+    consolidatedvolume_data = ticker_df[ticker_df['ticker'] == ticker]['ConsolidatedVolume'].tolist()[0]
+    marketOpen_data = ticker_df[ticker_df['ticker'] == ticker]['MarketOpen'].tolist()[0]
+    previousClose_data = ticker_df[ticker_df['ticker'] == ticker]['PreviousClose'].tolist()[0]
     name_data = ticker_df[ticker_df['ticker'] == ticker]['CompanyName'].tolist()[0]
     size_data = ticker_df[ticker_df['ticker'] == ticker]['CompanySize'].tolist()[0]
     sector_data = ticker_df[ticker_df['ticker'] == ticker]['Sector'].tolist()[0]
     description_data = ticker_df[ticker_df['ticker'] == ticker]['Description'].tolist()[0]
-    dividend_data = get_dividentyield(ticker)
-    annualReturn_data = get_annualreturn(ticker)
+    dividend_data = ticker_df[ticker_df['ticker'] == ticker]['DividentYield'].tolist()[0]
+    annualReturn_data = ticker_df[ticker_df['ticker'] == ticker]['AnnualReturn'].tolist()[0]
     data = {
         'ticker': ticker,
         'graph_data': graph_data,
