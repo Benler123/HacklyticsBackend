@@ -7,6 +7,10 @@ import mongo_connector
 import iex_connector
 import json
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+import gpt_chatbot
+
+
+sector_averages = {'Manufacturing': 27.128207770965183, 'Information': 102.45399150817262, 'Utilities': 18.260429501527625, 'Finance and Insurance': 23.883056669680943, 'Administrative and Support and Waste Management and Remediation Services': 12.773875751491111, 'Retail Trade': 26.22744648757113, '': 40.36302307724007, 'Transportation and Warehousing': 23.774693737012072, 'Mining, Quarrying, and Oil and Gas Extraction': 10.798852278405514, 'Professional, Scientific, and Technical Services': 33.64500411865372, 'Accommodation and Food Services': 58.81457808263933, 'Real Estate and Rental and Leasing': 301.6988717606318, 'Wholesale Trade': 22.95699642519311, 'Public Administration': 43.94384020145358, 'Health Care and Social Assistance': 21.418444120490307, 'Construction': 17.58605288694844, 'Other Services (except Public Administration)': 17.21779153778833}
 
 app = FastAPI()
 
@@ -174,7 +178,7 @@ def compile_data(ticker):
     return data
 
 #Only need these three endpoints
-@app.get('/create_account/{risk_level}/{sectors}/{companyAge}/{companySize}') 
+@app.get('/create_account/{risk_level}/{co}/{companyAge}/{companySize}') 
 def add_account(risk_level, sectors, companyAge, companySize):
     mongo_connector.add_account(risk_level, sectors, companyAge, companySize)
 
@@ -196,6 +200,14 @@ def get_next_ticker(this_ticker, swiped):
     add_swipe(this_ticker, swiped)
     return compile_data(stock)
 
+@app.get('/gpt_chat/{ticker}/{prompt}')
+def get_gpt_chat(ticker, prompt):
+    news = ticker_df[ticker_df['ticker'] == ticker]['headlines'].tolist()
+    beta = ticker_df[ticker_df['ticker'] == ticker]['Beta'].tolist()
+    pe = ticker_df[ticker_df['ticker'] == ticker]['PE'].tolist()
+    sector = ticker_df[ticker_df['ticker'] == ticker]['Sector'].tolist()
+    sectorPE = sector_averages[get_sector(ticker)]
+    return gpt_chatbot.answer_question_ticker(ticker, prompt, news, beta, pe, sector, sectorPE)
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8001)

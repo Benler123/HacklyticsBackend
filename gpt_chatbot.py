@@ -34,7 +34,7 @@ def answer_question(question, api_key=os.environ.get("OPENAI_API_KEY")):
 
 def answer_question_ticker(ticker, question, news, beta, pe, sector, sectorPE, api_key=os.environ.get("OPENAI_API_KEY")):
     # print(api_key)
-    prompt = "The following question is from a beginning investor looking to learn more about stocks. Please answer in one paragraph in a way that is easily understandable."
+    prompt = "The following question is from a beginning investor looking to learn more about stocks. Please answer in one paragraph in a way that is easily understandable. Do not provide financial advice"
 
     headers = {
         "Content-Type": "application/json",
@@ -43,7 +43,7 @@ def answer_question_ticker(ticker, question, news, beta, pe, sector, sectorPE, a
     i = 1
     newsString = ""
     for newsArticle in news:
-        newsString = newsString + "\nArticle headline {i}: " + newsArticle["Headline"]
+        newsString = newsString + "\nArticle headline {i}: " + newsArticle[0]
         i+=1
     
     text =  """{prompt} The ticker for the stock which prompted the question was {ticker}.
@@ -53,6 +53,7 @@ def answer_question_ticker(ticker, question, news, beta, pe, sector, sectorPE, a
             to provide real time data, but you can generally analyze the stock based on these provided parameters.
             Keeping this background information in mind, please answer the question: {question}""".format(prompt = prompt, 
             ticker = ticker, beta = beta, pe = pe, sector = sector, sectorPE = sectorPE, newsString = newsString, question = question)
+    
     
     # print(text)
 
