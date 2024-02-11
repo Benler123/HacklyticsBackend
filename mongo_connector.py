@@ -57,3 +57,17 @@ def replace_nan_divident_yield():
         {"$set": {"DividentYield": 0}}
     )
 
+def get_beta_mdb(ticker): 
+    ticker_data = tickers_collections.find_one({"ticker": ticker})
+    beta = ticker_data.get("Beta")
+    return beta
+
+def get_annual_return_mdb(ticker): 
+    ticker_data = tickers_collections.find_one({"ticker": ticker})
+    annual_return = ticker_data.get("AnnualReturn")
+    return annual_return
+
+def get_sector_mdb(ticker): 
+    ticker_data = tickers_collections.find_one({"ticker": ticker})
+    sector = ticker_data.get("Sector")
+    return sector
