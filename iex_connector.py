@@ -181,7 +181,6 @@ def recommend_stocks(stock_id, stocks_df, sectors, seen, top_n=1, sector_penalty
 
     # Calculate the distance between the chosen stock and all others, including sector penalty
     def adjusted_distance(row):
-        print(row)
         if(np.isnan(row['PE'])):
             row['PE'] = 1
         if(np.isnan(row['forwardPE'])):
@@ -207,7 +206,6 @@ def recommend_stocks(stock_id, stocks_df, sectors, seen, top_n=1, sector_penalty
     # Get the top_n closest stocks, adjusted for sector penalty
     recommended_indices = np.argsort(filtered_distances)[1]  # Exclude the first one (itself)
     recommended_stocks = stocks_df.iloc[recommended_indices]
-    print(str(len(recommended_stocks)) + "LENGTH")
 
 
     return recommended_stocks['ticker']

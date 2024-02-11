@@ -50,3 +50,9 @@ def get_chosen():
     return tickers
 
 
+def replace_nan_divident_yield():
+    tickers_collections.update_many(
+        {"DividentYield": float('nan')},
+        {"$set": {"DividentYield": 0}}
+    )
+
