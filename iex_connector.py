@@ -53,7 +53,8 @@ def cold_start(df, risk_levels, sectors):
     # Randomly select a stock from the given sectors
     sector_df = df[df['Sector'].isin(sectors)]
     differences = (df['PE'] - df['forwardPE']).tolist()
-    sorted_indices = np.argsort(differences)[::-1]   
+    mask = differences != 0
+    sorted_indices = np.argsort(differences)[mask][::-1]  
     return df.iloc[sorted_indices[int(risk_levels / 10.01 * len(df))]]['ticker'] 
 
 import json
@@ -179,6 +180,7 @@ def recommend_stocks(stock_id, stocks_df, sectors, seen, top_n=1, sector_penalty
 
     # Calculate the distance between the chosen stock and all others, including sector penalty
     def adjusted_distance(row):
+        print(row)
         if(np.isnan(row['PE'])):
             row['PE'] = 1
         if(np.isnan(row['forwardPE'])):
