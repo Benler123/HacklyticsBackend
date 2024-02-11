@@ -52,3 +52,4 @@ docs/_build/
 /ignored
 **.DS_Store
 *.pyc
+vs-kp-1.pem
