@@ -9,7 +9,6 @@ import json
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 
 app = FastAPI()
-app.add_middleware(HTTPSRedirectMiddleware)
 
 origins = ["*"]
 
