@@ -22,7 +22,6 @@ def get_portfolio():
             portfolio[ticker] = {
                 "Sector": sector, 
                 "Beta": beta, 
-                "Annual_return": annual_return
+                "Annual Return": annual_return
             }
     return portfolio
-print(get_portfolio())
