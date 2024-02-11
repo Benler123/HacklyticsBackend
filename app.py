@@ -185,8 +185,7 @@ def add_account(risk_level, sectors, companyAge, companySize):
 @app.get('/get_next_ticker')
 def get_first_ticker():
     ticker = iex_connector.cold_start(ticker_df, account_df['risk_level'].tolist()[0], account_df['sectors'].tolist()[0])
-    json_data = json.dumps(compile_data(ticker))
-    return json_data
+    return compile_data(ticker)
 
 @app.get('/get_next_ticker/{this_ticker}/{swiped}')
 def get_next_ticker(this_ticker, swiped):
