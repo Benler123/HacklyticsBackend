@@ -115,7 +115,7 @@ def get_marketopen(ticker):
 
 @app.get('/RealTimeConsolidatedVolume/{ticker}')
 def get_consolidatedvolume(ticker):
-    return iex_connector.get_consolidated_volume(ticker)
+    return iex_connector.get_consolidatedvolume(ticker)
 
 @app.get('/MarketCap/{ticker}')
 def get_marketcap(ticker):
