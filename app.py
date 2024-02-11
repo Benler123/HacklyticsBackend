@@ -3,7 +3,8 @@ import requests
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
 from datetime import datetime
-
+import mongo_connector
+import iex_connector
 
 app = FastAPI()
 origins = ["*"]
@@ -16,6 +17,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+ticker_df = mongo_connector.return_ticker_df()
+account_df = mongo_connector.return_account_df()
 
 token = "pk_6dcff48d8ea347d8aaafcbc3c123073e"
 url = "https://api.iex.cloud/v1/data/core"
@@ -121,19 +124,22 @@ def get_marketcap(ticker):
 
 
 
+@app.put('/add_swipe/{swiped}')
+def add_swipe(ticker, swiped):
+    mongo_connector.add_swipe(ticker, swiped)
 
+@app.get('/create_account/{risk_level}/{sectors}/{companyAge}/{companySize}') 
+def add_account(risk_level, sectors, companyAge, companySize):
+    mongo_connector.add_account(risk_level, sectors, companyAge, companySize)
 
-def predict_sentiment(): 
-    # for ticker in SP_tickers: 
-        # fetch all articles headline for that ticker
-        # headlines = fetch_headlines(ticker)
-    headlines = []
-    for headline in headlines: 
-        payload = { "inputs": headline }
-        response = requests.post(API_URL, headers=headers, json=headline)
-        response = response.json()
-        
-        return response.json()
+@app.get('/get_next_ticker/{this_ticker}/{swiped}')
+def get_next_ticker(this_ticker, swiped):
+    sectors = account_df['sectors'].tolist()[0]
+    risk_level = account_df['risk_level'].tolist()[0] 
+    seen = set(mongo_connector.get_seen())
+    stock = iex_connector.recommend_stocks(this_ticker, ticker_df, sectors, seen)
+    add_swipe(this_ticker, swiped)
+    return stock
 
 if __name__ == "__main__":
     uvicorn.run(app, host="127.0.0.1", port=8001)
