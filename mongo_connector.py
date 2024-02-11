@@ -13,7 +13,6 @@ cluster = MongoClient(uri)
 db = cluster["StockData"]
 tickers_collections = db["Tickers"]
 swipes_collection = db["Swipes"]
-sentiment_collections = db["Sentiments"]
 accounts_collection = db["Account"]
 
 def clear_tickers():
@@ -22,23 +21,11 @@ def clear_tickers():
 def clear_swipes():
     swipes_collection.delete_many({})
 
-def add_ticker_info(ticker, pe, marketCap, forwardPE, beta, sector, headlines): 
-    tickers_collections.insert_one({"ticker": ticker, "PE": pe, "forwardPE":forwardPE, "MarketCap":marketCap, "Beta": beta, "Sector": sector, "headlines": headlines})
+def add_ticker_info(ticker, pe, marketCap, forwardPE, beta, sector, sentiment, headlines): 
+    tickers_collections.insert_one({"ticker": ticker, "PE": pe, "forwardPE":forwardPE, "MarketCap":marketCap, "Beta": beta, "Sector": sector, "Sentiment": sentiment, "headlines": headlines})
 
 def add_swipe(ticker, swiped):
     swipes_collection.insert_one({"ticker": ticker, "swiped":swiped})
-
-def add_sentiment(ticker, sentiment_score): 
-    sentiment_collections.insert_one({"ticker": ticker, "percentage": sentiment_score})
-
-def add_all_sentiments(): 
-    with open("sentiments.json", mode='r') as file_object:
-        loaded_sentiments = json.load(file_object)
-        for sentiment in loaded_sentiments: 
-            print(sentiment)
-            add_sentiment(sentiment)
-    
-
 
 def return_ticker_df():
     tickers_collections.find({})
@@ -61,4 +48,5 @@ def get_chosen():
     df = pd.DataFrame(list(swipes_collection.find({})))
     tickers = df.loc[df["swiped"] == "right", "ticker"].tolist()
     return tickers
+
 

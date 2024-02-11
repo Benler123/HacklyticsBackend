@@ -152,7 +152,6 @@ def compile_data(ticker):
     description_data = get_description(ticker)
     dividend_data = get_dividentyield(ticker)
     annualReturn_data = get_annualreturn(ticker)
-    sentiment = get_sentiment(ticker)
     data = {
         'ticker': ticker,
         'graph_data': graph_data,

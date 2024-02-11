@@ -45,6 +45,12 @@ def cold_start(df, risk_levels, sectors):
     sorted_indices = np.argsort(differences)[::-1]   
     return df.iloc[sorted_indices[int(risk_levels / 10.01 * len(df))]]['ticker'] 
 
+import json
+def load_sentiments(): 
+    with open("sentiments.json", mode='r') as file_object:
+        sentiments = json.load(file_object)
+        return sentiments
+    
 # https://api.iex.cloud/v1/data/core/news/aapl?last=100&token=pk_6dcff48d8ea347d8aaafcbc3c123073e
 def create_df():
     tickers = SP_tickers
@@ -55,8 +61,11 @@ def create_df():
     sector_list = []
     marketCap_list = []
     headers_list = []
+    sentiments_list = []
     count = 0
-    for ticker in tickers:
+    sentiments = load_sentiments()
+    for i, ticker in enumerate(tickers):
+        sentiment = sentiments[i]['sentiment_score']
         pe, beta, forwardPE, marketCap = get_advanced_stats(ticker)
         time.sleep(0.2)
         if pe == None or beta == None:
@@ -67,11 +76,11 @@ def create_df():
             forwardPE_list.append(forwardPE)
             sector_list.append(get_sector(ticker))
             marketCap_list.append(marketCap)
+            sentiments_list.append(sentiment)
             headers_list.append(get_headers(ticker))
         count += 1
         if count % 10 == 0:
             print(count)
-
 
     tickers = [ticker for ticker in tickers if ticker not in not_good]
 
@@ -82,6 +91,7 @@ def create_df():
         "MarketCap": marketCap_list,
         "Beta": Beta_list,
         "Sector": sector_list,
+        "Sentiment": sentiments_list,
         "Headers": headers_list
     }
 
@@ -123,3 +133,8 @@ def recommend_stocks(stock_id, stocks_df, sectors, seen, top_n=1, sector_penalty
     recommended_stocks = stocks_df.iloc[recommended_indices]
 
     return recommended_stocks['ticker']
+
+
+df = create_df()
+for index, row in df.iterrows():
+    mongo_connector.add_ticker_info(row['ticker'], row['PE'], row['MarketCap'], row['forwardPE'], row['Beta'], row['Sector'], row['Sentiment'], row['Headers'])
