@@ -51,12 +51,11 @@ def scale_df(df):
 
 def cold_start(df, risk_levels, sectors):
     # Randomly select a stock from the given sectors
-    sector_df = df[df['Sector'].isin(sectors)]
-    differences = (df['PE'] - df['forwardPE']).tolist()
-    mask = differences != 0
-    filtered_differences = differences[mask]
-    sorted_indices = np.argsort(filtered_differences)[::-1]
-    return df.iloc[sorted_indices[int(risk_levels / 10.01 * len(sorted_indices))]]['ticker'] 
+    df = df[df['Sector'].isin(sectors[0])]
+    df["differences"] = df["PE"] - df["forwardPE"]
+    filtered_differences = df[df["differences"] != 0]
+    sorted_differences = filtered_differences.sort_values(by="differences")
+    return df.iloc[int(int(risk_levels) / 10.01 * len(sorted_differences))]['ticker'] 
 
 import json
 def load_sentiments(): 
@@ -195,17 +194,18 @@ def recommend_stocks(stock_id, stocks_df, sectors, seen, top_n=1, sector_penalty
         distance += sector_penalty.get(row['Sector'],0)
         return distance
     
-    distances = stocks_df.apply(adjusted_distance, axis=1)
+    stocks_df["distances"] = stocks_df.apply(adjusted_distance, axis=1)
     filtered_stocks_df = stocks_df[~stocks_df['ticker'].isin(seen)]
-    
+    filtered_stocks_min = filtered_stocks_df[filtered_stocks_df['distances'] > min_distance]
     # Apply minimum distance filtering on the remaining stocks
-    filtered_distances = distances[filtered_stocks_df.index]
-    filtered_distances = filtered_distances[distances > min_distance]
-    if(len(filtered_distances) == 0):
+    # filtered_distances = distances[filtered_stocks_df.index]
+    # filtered_distances = filtered_distances[distances > min_distance]
+    if(len(filtered_stocks_min) == 0):
         return cold_start(stocks_df, 5, sectors)
-    # Get the top_n closest stocks, adjusted for sector penalty
-    recommended_indices = np.argsort(filtered_distances)[1]  # Exclude the first one (itself)
-    recommended_stocks = stocks_df.iloc[recommended_indices]
+    # # Get the top_n closest stocks, adjusted for sector penalty
+    sorted = filtered_stocks_min.sort_values(by="distances")
+    recommended_stocks = sorted.iloc[1]
+    # recommended_stocks = stocks_df.iloc[recommended_indices]
 
 
-    return recommended_stocks['ticker']
+    return recommended_stocks["ticker"]

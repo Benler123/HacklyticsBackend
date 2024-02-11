@@ -38,7 +38,7 @@ def index():
 
 @app.get('/CompanyName/{ticker}')
 def get_companyname(ticker):
-    return iex_connector.get_company_name(ticker)
+    return iex_connector.get_companyname(ticker)
 
 @app.get('/CompanySize/{ticker}')
 def get_companysize(ticker):
@@ -70,8 +70,6 @@ def get_graph(ticker):
 
 @app.get('/intraday/{ticker}')
 def get_intraday(ticker):
-    print(url + f"/intraday_prices/{ticker}?token={token}")
-    print("TICKER " + ticker)
     intraday_json = requests.get(url + f"/intraday_prices/{ticker}?token={token}").json()
     intraday_dict = {day["minute"]: day["average"] for day in intraday_json}
     i = 0
@@ -258,12 +256,13 @@ def get_allocation(RiskProfile):
 #Only need these three endpoints
 @app.get('/create_account/{risk_level}/{sectors}/{companyAge}/{companySize}') 
 def add_account(risk_level, sectors, companyAge, companySize):
-    mongo_connector.add_account(risk_level, sectors, companyAge, companySize)
+    sector_list = sectors.replace('"', '').replace(' ', '').split(",")
+    mongo_connector.add_account(risk_level, sector_list, companyAge, companySize)
 
 
 @app.get('/get_next_ticker')
 def get_first_ticker():
-    ticker = iex_connector.cold_start(ticker_df, account_df['risk_level'].tolist()[0], account_df['sectors'].tolist()[0])
+    ticker = iex_connector.cold_start(ticker_df, account_df['risk_level'].tolist()[0], account_df['sectors'].tolist())
     return compile_data(ticker)
 
 @app.get('/get_next_ticker/{this_ticker}/{swiped}')
