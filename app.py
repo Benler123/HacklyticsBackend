@@ -164,7 +164,7 @@ def compile_data(ticker):
     return data
 
 #Only need these three endpoints
-@app.get('/create_account/{risk_level}/{co}/{companyAge}/{companySize}') 
+@app.get('/create_account/{risk_level}/{sectors}/{companyAge}/{companySize}') 
 def add_account(risk_level, sectors, companyAge, companySize):
     mongo_connector.add_account(risk_level, sectors, companyAge, companySize)
 
