@@ -207,6 +207,7 @@ def recommend_stocks(stock_id, stocks_df, sectors, seen, top_n=1, sector_penalty
     # Get the top_n closest stocks, adjusted for sector penalty
     recommended_indices = np.argsort(filtered_distances)[1]  # Exclude the first one (itself)
     recommended_stocks = stocks_df.iloc[recommended_indices]
+    print(len(recommended_stocks) + "LENGTH")
     print("STOCK:" + recommended_stocks)
 
     return recommended_stocks['ticker']
