@@ -21,8 +21,8 @@ def clear_tickers():
 def clear_swipes():
     swipes_collection.delete_many({})
 
-def add_ticker_info(ticker, pe, marketCap, forwardPE, beta, sector, sentiment, headlines): 
-    tickers_collections.insert_one({"ticker": ticker, "PE": pe, "forwardPE":forwardPE, "MarketCap":marketCap, "Beta": beta, "Sector": sector, "Sentiment": sentiment, "headlines": headlines})
+def add_ticker_info(ticker, pe, marketCap, forwardPE, beta, sector, sentiment, headlines, companyName, companySize, description, consolidatedVolume, marketOpen, previousClose, dividentYield, annualReturn): 
+    tickers_collections.insert_one({"ticker": ticker, "PE": pe, "forwardPE":forwardPE, "MarketCap":marketCap, "Beta": beta, "Sector": sector, "Sentiment": sentiment, "headlines": headlines, "CompanyName": companyName, "CompanySize": companySize, "Description": description, "ConsolidatedVolume": consolidatedVolume, "MarketOpen": marketOpen, "PreviousClose": previousClose, "DividentYield": dividentYield, "AnnualReturn": annualReturn})
 
 def add_swipe(ticker, swiped):
     swipes_collection.insert_one({"ticker": ticker, "swiped":swiped})

@@ -18,7 +18,7 @@ origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -36,18 +36,15 @@ def index():
 
 @app.get('/CompanyName/{ticker}')
 def get_companyname(ticker):
-    cn = (requests.get(url + f"/company/{ticker}?token={token}").json())[0]["companyName"]
-    return cn
+    return iex_connector.get_company_name(ticker)
 
 @app.get('/CompanySize/{ticker}')
 def get_companysize(ticker):
-    cs = (requests.get(url + f"/company/{ticker}?token={token}").json())[0]["employees"]
-    return cs
+    return iex_connector.get_companysize(ticker)
 
 @app.get('/Description/{ticker}')
 def get_description(ticker):
-    cs = (requests.get(url + f"/company/{ticker}?token={token}").json())[0]["shortDescription"]
-    return cs
+    return iex_connector.get_description(ticker)
 
 @app.get('/Sector/{ticker}')
 def get_sector(ticker):
@@ -110,33 +107,27 @@ def get_news(ticker):
 
 @app.get('/PreviousClose/{ticker}')
 def get_previousClose(ticker):
-    pc = (requests.get(url + f"/quote/{ticker}?token={token}").json())[0]["previousClose"]
-    return pc #returns integer
+    return iex_connector.get_previous_close(ticker)
 
 @app.get('/MarketOpen/{ticker}')
 def get_marketopen(ticker):
-    mo = (requests.get(url + f"/quote/{ticker}?token={token}").json())[0]["open"]
-    return mo # returns integer
+    return iex_connector.get_market_open(ticker)
 
 @app.get('/RealTimeConsolidatedVolume/{ticker}')
 def get_consolidatedvolume(ticker):
-    rtcv = (requests.get(url + f"/quote/{ticker}?token={token}").json())[0]["latestVolume"]
-    return rtcv # Required: If you display the latestVolume value, you must display Consolidated Volume in Real-time near that value.
+    return iex_connector.get_consolidated_volume(ticker)
 
 @app.get('/MarketCap/{ticker}')
 def get_marketcap(ticker):
-    mc = (requests.get(url + f"/quote/{ticker}?token={token}").json())[0]["marketCap"]
-    return mc
+    return iex_connector.get_market_cap(ticker)
 
 @app.get('/DividentYield/{ticker}')
 def get_dividentyield(ticker):
-    dy = (requests.get(url + f"/fundamental_valuations/{ticker}?token={token}").json())[0]["dividendYield"]
-    return dy #returns integer
+    return iex_connector.get_dividend_yield(ticker)
 
 @app.get('/AnnualReturn/{ticker}')
 def get_annualreturn(ticker):
-    dy = (requests.get(url + f"/advanced_stats/{ticker}?token={token}").json())[0]["year1ChangePercent"]
-    return dy #returns integer
+    return iex_connector.get_annual_return(ticker)
 
 @app.put('/add_swipe/{swiped}')
 def add_swipe(ticker, swiped):
@@ -147,15 +138,15 @@ def add_swipe(ticker, swiped):
 def compile_data(ticker):
     graph_data = get_graph(ticker)
     intraday_data = get_intraday(ticker)
-    marketcap_data = get_marketcap(ticker)
-    pe_data = get_PE(ticker)
+    marketcap_data = ticker_df[ticker_df['ticker'] == ticker]['MarketCap'].tolist()[0]
+    pe_data = ticker_df[ticker_df['ticker'] == ticker]['PE'].tolist()[0]
     consolidatedvolume_data = get_consolidatedvolume(ticker)
     marketOpen_data = get_marketopen(ticker)
     previousClose_data = get_previousClose(ticker)
-    name_data = get_companyname(ticker)
-    size_data = get_companysize(ticker)
-    sector_data = get_sector(ticker)
-    description_data = get_description(ticker)
+    name_data = ticker_df[ticker_df['ticker'] == ticker]['CompanyName'].tolist()[0]
+    size_data = ticker_df[ticker_df['ticker'] == ticker]['CompanySize'].tolist()[0]
+    sector_data = ticker_df[ticker_df['ticker'] == ticker]['Sector'].tolist()[0]
+    description_data = ticker_df[ticker_df['ticker'] == ticker]['Description'].tolist()[0]
     dividend_data = get_dividentyield(ticker)
     annualReturn_data = get_annualreturn(ticker)
     data = {
