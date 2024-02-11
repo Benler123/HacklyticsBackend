@@ -70,8 +70,6 @@ def get_graph(ticker):
 
 @app.get('/intraday/{ticker}')
 def get_intraday(ticker):
-    print(url + f"/intraday_prices/{ticker}?token={token}")
-    print("TICKER " + ticker)
     intraday_json = requests.get(url + f"/intraday_prices/{ticker}?token={token}").json()
     intraday_dict = {day["minute"]: day["average"] for day in intraday_json}
     i = 0
