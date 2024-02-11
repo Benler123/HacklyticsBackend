@@ -32,7 +32,7 @@ def return_ticker_df():
 def add_account(risk_level, sectors, companyAge, companySize):
     accounts_collection.delete_many({})
     clear_swipes()
-    accounts_collection.insert_one({"risk_level": risk_level, "sectors":sectors, "companyAge":companyAge, "companySize":companySize})
+    accounts_collection.insert_one({"risk_level": int(risk_level), "sectors":sectors, "companyAge":int(companyAge), "companySize":int(companySize)})
 
 def return_account_df():
     df = pd.DataFrame(list(accounts_collection.find({})))
