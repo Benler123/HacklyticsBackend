@@ -135,6 +135,6 @@ def recommend_stocks(stock_id, stocks_df, sectors, seen, top_n=1, sector_penalty
     return recommended_stocks['ticker']
 
 
-df = create_df()
-for index, row in df.iterrows():
-    mongo_connector.add_ticker_info(row['ticker'], row['PE'], row['MarketCap'], row['forwardPE'], row['Beta'], row['Sector'], row['Sentiment'], row['Headers'])
+# df = create_df()
+# for index, row in df.iterrows():
+#     mongo_connector.add_ticker_info(row['ticker'], row['PE'], row['MarketCap'], row['forwardPE'], row['Beta'], row['Sector'], row['Sentiment'], row['Headers'])
