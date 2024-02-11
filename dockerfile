@@ -11,6 +11,7 @@ COPY ./chatbot_integ /code/chatbot_integ
 COPY ./iex_connector /code/iex_connector
 COPY ./mongo_connector /code/mongo_connector
 COPY ./gpt_chatbot /code/gpt_chatbot
+COPY ./PortfolioGenerator /code/PortfolioGenerator
 
 EXPOSE 80
 
