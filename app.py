@@ -258,6 +258,7 @@ def get_allocation(RiskProfile):
 #Only need these three endpoints
 @app.get('/create_account/{risk_level}/{sectors}/{companyAge}/{companySize}') 
 def add_account(risk_level, sectors, companyAge, companySize):
+    print(sectors)
     mongo_connector.add_account(risk_level, sectors, companyAge, companySize)
 
 
