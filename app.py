@@ -226,7 +226,7 @@ def get_allocation(RiskProfile):
            index1 = random.randrange(len(allocDict))
            index2 = random.randrange(len(allocDict))
            allocChange = random.uniform(0, 0.05)
-           if (iters == 400):
+           if (iters == 20):
                break
            if (allocDict[tickerVector[index2]] - allocChange > 0):
                 allocDict[tickerVector[index1]] += allocChange

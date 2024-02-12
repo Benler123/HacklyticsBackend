@@ -26,4 +26,3 @@ def get_portfolio():
             }
     return portfolio
 
-print(get_portfolio())
