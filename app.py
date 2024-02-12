@@ -273,6 +273,7 @@ def get_first_ticker():
 
 @app.get('/get_next_ticker/{this_ticker}/{swiped}')
 def get_next_ticker(this_ticker, swiped):
+    account_df = mongo_connector.return_account_df()
     add_swipe(this_ticker, swiped)
     sectors = account_df['sectors'].tolist()[0]
     risk_level = account_df['risk_level'].tolist()[0] 

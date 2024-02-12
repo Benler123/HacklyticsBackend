@@ -36,6 +36,7 @@ def add_account(risk_level, sectors, companyAge, companySize):
 
 def return_account_df():
     df = pd.DataFrame(list(accounts_collection.find({})))
+    print(df['sectors'])
     return df
 
 def get_seen():
