@@ -51,9 +51,8 @@ def scale_df(df):
 
 def cold_start(df, risk_levels, sectors):
     # Randomly select a stock from the given sectors
-    print(df['Sector'].unique())
     df = df[df['Sector'].isin(sectors[0])]
-    print(sectors)
+    print("ACC" , sectors)
     print(df)
     df["differences"] = (df["PE"] - df["forwardPE"]).abs()
     filtered_differences = df[df["differences"] != 0]
