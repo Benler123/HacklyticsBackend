@@ -51,10 +51,14 @@ def scale_df(df):
 
 def cold_start(df, risk_levels, sectors):
     # Randomly select a stock from the given sectors
+    print(df['Sector'].unique())
     df = df[df['Sector'].isin(sectors[0])]
+    print(sectors)
+    print(df)
     df["differences"] = (df["PE"] - df["forwardPE"]).abs()
     filtered_differences = df[df["differences"] != 0]
     sorted_differences = filtered_differences.sort_values(by="differences")
+    print(risk_levels)
     return df.iloc[int(int(risk_levels) / 10.01 * len(sorted_differences))]['ticker'] 
 
 import json
@@ -177,6 +181,7 @@ def recommend_stocks(stock_id, stocks_df, sectors, seen, top_n=1, sector_penalty
     chosen_stock_features = stocks_df.loc[stocks_df['ticker'] == stock_id, ['Beta', 'PE', "forwardPE", "MarketCap"]].values[0]
     chosen_stock_sector = stocks_df.loc[stocks_df['ticker'] == stock_id, 'Sector'].values[0]
     stocks_df = stocks_df[stocks_df['Sector'].isin(sectors)]
+    print(sectors)
 
     # Calculate the distance between the chosen stock and all others, including sector penalty
     def adjusted_distance(row):
