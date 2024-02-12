@@ -267,6 +267,7 @@ def add_account(risk_level, sectors, companyAge, companySize):
 
 @app.get('/get_next_ticker')
 def get_first_ticker():
+    account_df = mongo_connector.return_account_df()
     ticker = iex_connector.cold_start(ticker_df, account_df['risk_level'].tolist()[0], account_df['sectors'].tolist())
     return compile_data(ticker)
 
